@@ -19,7 +19,7 @@ namespace CustomDeathMessages
 {
     public class Entry : IPlugin
     {
-        public string IPCIdentifier { get { return "CustomDeathMessages"; }  set { } }
+        public string IPCIdentifier { get { return "CustomDeathMessages"; } set { } }
 
         public void Initialize(IManager manager)
         {
@@ -36,43 +36,70 @@ namespace CustomDeathMessages
 
                 string message = data.message_;
 
-                if(message.Contains("was terminated by the laser grid"))
+                if (message.Contains("was terminated by the laser grid"))
                 {
                     message = Message.GetMessage("KillGrid", name);
                 }
-                else if(message.Contains("reset"))
+                else if (message.Contains("reset"))
                 {
                     message = Message.GetMessage("SelfTermination", name);
                 }
-                else if(message.Contains("was wrecked after getting split"))
+                else if (message.Contains("was wrecked after getting split"))
                 {
                     message = Message.GetMessage("LaserOverheated", name);
                 }
-                else if(message.Contains("got wrecked?"))
+                else if (message.Contains("got wrecked?"))
                 {
                     message = Message.GetMessage("AntiTunnelSquish", name);
                 }
-                else if(message.Contains("got wrecked"))
+                else if (message.Contains("got wrecked"))
                 {
                     message = Message.GetMessage("Impact", name);
                 }
-                else if(message.Contains("exploded from overheating"))
+                else if (message.Contains("exploded from overheating"))
                 {
                     message = Message.GetMessage("Overheated", name);
                 }
-                else if(message.Contains("multiplier!"))
+                else if (message.Contains("multiplier!"))
                 {
                     int result;
                     int.TryParse(message.Substring(14), out result);
                     message = Message.GetMessage("StuntCollect", name, result);
                 }
-                else if(message.Contains("was kicked due to not having this level"))
+                else if (message.Contains("was kicked due to not having this level"))
                 {
                     message = Message.GetMessage("KickNoLevel", name);
                 }
-                else if(message.Contains("finished"))
+                else if (message.Contains("finished"))
                 {
                     message = Message.GetMessage("Finished", name);
+                }
+
+                Message.SendMessage(message);
+
+                return false;
+            }
+        }
+
+        [HarmonyPatch(typeof(ClientLogic), "OnEventToAllClientsRemotePlayerActionMessage")]
+        internal class ClientLogicOnEventToAllClientsRemotePlayerActionMessage
+        {
+            static bool Prefix(ClientLogic __instance, ToAllClientsRemotePlayerActionMessage.Data data)
+            {
+                string message = data.message_;
+                var name = (__instance.GetType().GetField("clientPlayerList_", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(__instance) as List<ClientPlayerInfo>)[data.index_].GetChatName("FFFFFF");
+
+                if(message.Contains("is not ready"))
+                {
+                    message = Message.GetMessage("NotReady", name);
+                }
+                else if(message.Contains("left the match to spectate"))
+                {
+                    message = Message.GetMessage("Spectate", name);
+                }
+                else if(message.Contains("has taken the lead!"))
+                {
+                    message = Message.GetMessage("TagPointsLead", name);
                 }
 
                 Message.SendMessage(message);

@@ -11,12 +11,13 @@ namespace CustomDeathMessages
 {
     static class Message
     {
-        static Dictionary<string, string> m_sentenses;
+        static Dictionary<string, string[]> m_sentenses;
+        static Random m_random = new Random();
 
         public static void SendMessage(string message)
         {
 #pragma warning disable CS0618 // Le type ou le membre est obsolète
-            StaticTransceivedEvent<ChatMessage.Data>.Broadcast(new ChatMessage.Data(message.Colorize("[FFE999]")));
+            StaticTransceivedEvent<ChatMessage.Data>.Broadcast(new ChatMessage.Data("[-][-][-][-][-]" + message.Colorize("[FFE999]") + "[-][-][-][-][-]"));
 #pragma warning restore CS0618 // Le type ou le membre est obsolète
         }
 
@@ -30,7 +31,7 @@ namespace CustomDeathMessages
                 throw new Exception("The value you want to retrieve does not exist.");
             }
 
-            var str = m_sentenses[key];
+            var str = m_sentenses[key][m_random.Next(m_sentenses[key].Length)];
             
             for(int i = 0; i < values.Length; i++)
                 str = str.Replace("{" + i + "}", values[i].ToString());
@@ -50,17 +51,20 @@ namespace CustomDeathMessages
         {
             var settings = new Settings("CustomDeathMessages");
 
-            var entries = new Dictionary<string, string>
+            var entries = new Dictionary<string, string[]>
             {
-                {"KillGrid", "{0} was terminated by the laser grid" },
-                {"SelfTermination", "{0} reset" },
-                {"LaserOverheated", "{0} was wrecked after getting split" },
-                {"Impact", "{0} got wrecked" },
-                {"Overheated", "{0} exploded from overheating" },
-                {"AntiTunnelSquish", "{0} got wrecked?" },
-                {"StuntCollect", "{0} grabbed the x{1} multiplier!" },
-                {"KickNoLevel", "{0} was kicked due to not having this level" },
-                {"Finished", "{0} finished" }
+                {"KillGrid", new string[]{"{0} was terminated by the laser grid" } },
+                {"SelfTermination", new string[]{"{0} reset" } },
+                {"LaserOverheated", new string[]{"{0} was wrecked after getting split" } },
+                {"Impact", new string[]{"{0} got wrecked" } },
+                {"Overheated", new string[]{"{0} exploded from overheating" } },
+                {"AntiTunnelSquish", new string[]{"{0} got wrecked?" } },
+                {"StuntCollect", new string[]{"{0} grabbed the x{1} multiplier!" } },
+                {"KickNoLevel", new string[]{"{0} was kicked due to not having this level" } },
+                {"Finished", new string[]{"{0} finished" } },
+                {"NotReady", new string[]{"{0} is not ready" } },
+                {"Spectate", new string[]{"{0} left the match to spectate" } },
+                {"TagPointsLead" , new string[]{"{0} has taken the lead!" } }
             };
 
             foreach (var s in entries)
@@ -69,9 +73,9 @@ namespace CustomDeathMessages
 
             settings.Save();
 
-            m_sentenses = new Dictionary<string, string>();
+            m_sentenses = new Dictionary<string, string[]>();
             foreach (var s in entries)
-                m_sentenses[s.Key] = settings.GetItem<string>(s.Key);
+                m_sentenses[s.Key] = settings.GetItem<string[]>(s.Key);
         }
     }
 }
