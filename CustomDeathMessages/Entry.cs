@@ -19,9 +19,7 @@ namespace CustomDeathMessages
 {
     public class Entry : IPlugin
     {
-        public string IPCIdentifier { get { return "CustomDeathMessages"; } set { } }
-
-        public void Initialize(IManager manager)
+        public void Initialize(IManager manager, string ipcIdentifier)
         {
             var harmony = HarmonyInstance.Create("com.Larnin.CustomDeathMessages");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
